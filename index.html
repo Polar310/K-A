@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Belated Valentine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <style>
+        /* Reset & base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* no vertical scroll anywhere */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top left, #ffafbd, #ffc3a0 35%, #ff9a9e 70%, #fad0c4);
+            color: #2b1325;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        .app {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Soft glowing hearts background */
+        .app::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.28) 0, transparent 55%),
+                radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.22) 0, transparent 55%),
+                radial-gradient(circle at 20% 90%, rgba(255, 255, 255, 0.18) 0, transparent 55%);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            z-index: 1;
+        }
+
+        .slides::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.8rem 1.4rem 2rem;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 2rem;
+            padding: 1.6rem 1.5rem 1.9rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow:
+                0 24px 60px rgba(215, 40, 90, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 131, 179, 0.47), rgba(255, 75, 120, 0.0));
+            top: -140px;
+            right: -40px;
+            pointer-events: none;
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .badge {
+            align-self: flex-start;
+            padding: 0.2rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #c22f5c;
+            background: rgba(255, 194, 206, 0.9);
+            backdrop-filter: blur(10px);
+            margin-bottom: 0.7rem;
+        }
+
+        .title {
+            font-size: 1.9rem;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+            margin-bottom: 0.7rem;
+        }
+
+        .title span.accent {
+            color: #e01d5c;
+        }
+
+        .subtitle {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #7a3a5c;
+            margin-bottom: 1.3rem;
+        }
+
+        .tiny-note {
+            font-size: 0.8rem;
+            color: #b45c7c;
+            margin-bottom: 1.2rem;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 0.7rem;
+            margin-top: 0.8rem;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 0.8rem 1.4rem;
+            font-size: 0.98rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transform-origin: center;
+            transition:
+                transform 0.22s ease-out,
+                box-shadow 0.22s ease-out,
+                background 0.22s ease-out,
+                color 0.22s ease-out,
+                opacity 0.22s ease-out;
+            white-space: nowrap;
+        }
+
+        #yesBtn {
+            flex: 1.2;
+            background: linear-gradient(135deg, #ff4b7d, #ff758c);
+            color: #fff;
+            box-shadow: 0 14px 30px rgba(255, 95, 140, 0.55);
+        }
+
+        #yesBtn:active {
+            transform: scale(0.96) translateY(1px);
+            box-shadow: 0 8px 18px rgba(255, 95, 140, 0.45);
+        }
+
+        #noBtn {
+            flex: 0.8;
+            background: rgba(255, 197, 208, 0.96);
+            color: #b64c6a;
+            box-shadow: 0 10px 26px rgba(212, 106, 134, 0.3);
+        }
+
+        #noBtn:active {
+            transform: scale(0.94) translateY(1px);
+            box-shadow: 0 6px 12px rgba(212, 106, 134, 0.27);
+        }
+
+        .footer {
+            margin-top: auto;
+            padding-top: 1.4rem;
+            font-size: 0.8rem;
+            color: #b16a81;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dots {
+            display: flex;
+            gap: 0.45rem;
+            align-items: center;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: rgba(206, 121, 149, 0.45);
+        }
+
+        .dot.active {
+            width: 18px;
+            background: linear-gradient(135deg, #ff4b7d, #ff9a9e);
+        }
+
+        .hint {
+            font-size: 0.75rem;
+        }
+
+        /* Emoji love burst */
+        .emoji-burst {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 10;
+        }
+
+        .emoji {
+            position: absolute;
+            font-size: 1.6rem;
+            opacity: 0;
+            animation: floatUp 900ms ease-out forwards;
+            will-change: transform, opacity;
+            text-shadow: 0 6px 14px rgba(229, 50, 95, 0.65);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translate3d(var(--x), var(--startY), 0) scale(0.6) rotate(0deg);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            60% {
+                transform: translate3d(calc(var(--x) * 1.1), calc(var(--midY) * 0.8), 0) scale(1.05) rotate(var(--rotation));
+            }
+
+            100% {
+                transform: translate3d(calc(var(--x) * 1.5), var(--endY), 0) scale(0.85) rotate(calc(var(--rotation) * 1.3));
+                opacity: 0;
+            }
+        }
+
+        /* Slide 2 styles */
+        .slide-2-header {
+            margin-bottom: 1rem;
+        }
+
+        .slide-2-title {
+            font-size: 1.6rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.4rem;
+        }
+
+        .slide-2-title span {
+            color: #e01d5c;
+        }
+
+        .slide-2-subtitle {
+            font-size: 0.95rem;
+            color: #7a3a5c;
+            line-height: 1.5;
+        }
+
+        .photo-strip-wrapper {
+            margin-top: 0.9rem;
+        }
+
+        .strip-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #bc6988;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-strip {
+            display: flex;
+            flex-direction: row;
+            gap: 0.9rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .photo-strip::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .photo-strip::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .photo-strip::-webkit-scrollbar-thumb {
+            background: rgba(204, 118, 149, 0.38);
+            border-radius: 999px;
+        }
+
+        .photo-card {
+            flex: 0 0 68%;
+            max-width: 260px;
+            aspect-ratio: 3 / 4;
+            background: #fdf2f5;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            scroll-snap-align: center;
+            position: relative;
+            box-shadow:
+                0 14px 28px rgba(220, 81, 120, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.8);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: saturate(1.1) contrast(1.02);
+            transform: scale(1.03);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            inset: auto 0 0 0;
+            padding: 0.65rem 0.9rem 0.8rem;
+            background: linear-gradient(to top, rgba(23, 5, 16, 0.7), transparent);
+            color: #fde8ee;
+            font-size: 0.8rem;
+        }
+
+        .photo-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            opacity: 0.9;
+            margin-bottom: 0.1rem;
+        }
+
+        .photo-caption {
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .closing-text {
+            font-size: 0.9rem;
+            color: #7b3959;
+            line-height: 1.6;
+            margin-top: 0.4rem;
+        }
+
+        .closing-text span {
+            color: #e01d5c;
+            font-weight: 600;
+        }
+
+        .tiny-footer-2 {
+            margin-top: auto;
+            padding-top: 1.1rem;
+            font-size: 0.78rem;
+            color: #b16a81;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .swipe-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .swipe-indicator span {
+            font-size: 1.1rem;
+        }
+
+        /* Responsive tweaks for slightly wider screens */
+        @media (min-width: 480px) {
+            .card {
+                padding: 1.8rem 1.8rem 2.1rem;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="slides" id="slides">
+            <!-- SLIDE 1 -->
+            <section class="slide" id="slide1">
+                <div class="card">
+                    <div class="card-inner">
+                        <div>
+                            <div class="badge">okay, i'm a little late...</div>
+                            <h1 class="title">
+                                but can I still<br />
+                                be your <span class="accent">Valentine?</span>
+                            </h1>
+                            <p class="subtitle">
+                                I know the calendar says we’re past the 14th, but my heart kind of
+                                refused to get the memo. So this is me, owning up and asking anyway. 🥺
+                            </p>
+                            <p class="tiny-note">
+                                Consider this a <strong>belated, soft, slightly chaotic</strong> love confession.
+                            </p>
+
+                            <div class="buttons-row">
+                                <button id="yesBtn">Yes, obviously 💕</button>
+                                <button id="noBtn">No, sorry (lame)</button>
+                            </div>
+                        </div>
+
+                        <div class="footer">
+                            <div class="dots">
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <div class="hint">psst: swipe sideways only ✨</div>
+                        </div>
+                    </div>
+
+                    <!-- emoji burst container -->
+                    <div class="emoji-burst" id="emojiBurst"></div>
+                </div>
+            </section>
+
+            <!-- SLIDE 2 -->
+            <section class="slide" id="slide2">
+                <div class="card">
+                    <div class="card-inner">
+                        <div>
+                            <div class="badge">I knew you'd say yes 😘💗</div>
+
+                            <div class="slide-2-header">
+                                <h2 class="slide-2-title">
+                                    A tiny <span> photo gallery</span> of us
+                                </h2>
+                                <p class="slide-2-subtitle">
+                                    I know we haven't met as of yet, butttt thought it'd be funny to add these in
+                                    anywho!
+                                </p>
+                            </div>
+
+                            <div class="photo-strip-wrapper">
+                                <div class="strip-label">swipe sideways to browse</div>
+                                <div class="photo-strip">
+                                    <!-- CARD 1: Us vs Lizards -->
+                                    <article class="photo-card">
+                                        <img src="pictures/us-vs-lizards.png" alt="Cartoon of us vs the lizards" />
+                                        <div class="photo-overlay">
+                                            <div class="photo-tag">snapshot i</div>
+                                            <div class="photo-caption">Us vs lizards: still my favourite kind of
+                                                adventure.</div>
+                                        </div>
+                                    </article>
+
+                                    <!-- CARD 2: Surfing together -->
+                                    <article class="photo-card">
+                                        <img src="pictures/us-surfing.png" alt="Cartoon of us surfing together" />
+                                        <div class="photo-overlay">
+                                            <div class="photo-tag">snapshot ii</div>
+                                            <div class="photo-caption">Teaching ya surfinnnn, hand in
+                                                hand.</div>
+                                        </div>
+                                    </article>
+
+                                    <!-- CARD 3: Dressed up together -->
+                                    <article class="photo-card">
+                                        <img src="pictures/us-dressed-up.png" alt="Photo of us all dressed up" />
+                                        <div class="photo-overlay">
+                                            <div class="photo-tag">snapshot iii</div>
+                                            <div class="photo-caption">The Desi Mr. and Mrs. Smith. We're a great
+                                                looking couple.</div>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+
+                            <p class="closing-text">
+                                So yes, I'm late. But my heart's still here,
+                                still choosing <span>you</span>, on Valentine’s Day and on every
+                                ordinary, messy, in between day deux. 💘
+                                Give this dodohead a chanceeee plsssssss!!!
+                                I promise you every day would be entertaining!
+
+                            </p>
+                        </div>
+
+                        <div class="tiny-footer-2">
+                            <div class="dots">
+                                <div class="dot"></div>
+                                <div class="dot active"></div>
+                            </div>
+                            <div class="swipe-indicator">
+                                <span>←</span> more memories <span>→</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.getElementById("slides");
+        const yesBtn = document.getElementById("yesBtn");
+        const noBtn = document.getElementById("noBtn");
+        const emojiBurst = document.getElementById("emojiBurst");
+
+        let noScale = 1;
+        let noClicks = 0;
+
+        function shrinkNoButton() {
+            noClicks++;
+            noScale *= 0.78;
+
+            // Slight random nudge so it feels playful
+            const offsetX = (Math.random() - 0.5) * 18;
+            const offsetY = (Math.random() - 0.5) * 10;
+
+            if (noScale < 0.15 || noClicks > 6) {
+                noBtn.style.opacity = "0";
+                noBtn.style.transform = "scale(0) translate(0, 0)";
+                noBtn.style.pointerEvents = "none";
+                return;
+            }
+
+            noBtn.style.transform = `scale(${noScale}) translate(${offsetX}px, ${offsetY}px)`;
+            noBtn.style.opacity = Math.max(0.35, noScale).toString();
+        }
+
+        function createEmojiBurst() {
+            const emojis = ["💖", "💘", "💗", "💞", "💕", "💓", "💝", "🌸", "✨", "🌹"];
+            const count = 18;
+
+            for (let i = 0; i < count; i++) {
+                const span = document.createElement("span");
+                span.className = "emoji";
+                span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+                const x = (Math.random() - 0.5) * 150;
+                const startY = 40 + Math.random() * 40;
+                const midY = -10 - Math.random() * 40;
+                const endY = -120 - Math.random() * 60;
+                const rotation = (Math.random() - 0.5) * 60;
+
+                span.style.setProperty("--x", x + "px");
+                span.style.setProperty("--startY", startY + "px");
+                span.style.setProperty("--midY", midY + "px");
+                span.style.setProperty("--endY", endY + "px");
+                span.style.setProperty("--rotation", rotation + "deg");
+
+                const delay = Math.random() * 220;
+                span.style.animationDelay = delay + "ms";
+
+                const randomLeft = 15 + Math.random() * 70;
+                span.style.left = randomLeft + "%";
+                span.style.bottom = "15%";
+
+                emojiBurst.appendChild(span);
+
+                setTimeout(() => {
+                    span.remove();
+                }, 1200 + delay);
+            }
+        }
+
+        function goToSecondSlide() {
+            const width = window.innerWidth;
+            slides.scrollTo({
+                left: width,
+                behavior: "smooth",
+            });
+        }
+
+        yesBtn.addEventListener("click", () => {
+            createEmojiBurst();
+            setTimeout(goToSecondSlide, 650);
+        });
+
+        noBtn.addEventListener("click", () => {
+            shrinkNoButton();
+        });
+
+        // Make sure the slides always align perfectly when resizing (e.g. orientation change)
+        window.addEventListener("resize", () => {
+            const currentIndex = Math.round(slides.scrollLeft / window.innerWidth);
+            slides.scrollTo({
+                left: currentIndex * window.innerWidth,
+                behavior: "instant",
+            });
+        });
+    </script>
+</body>
+
+</html>
